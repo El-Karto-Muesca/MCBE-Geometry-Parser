@@ -1,10 +1,10 @@
-package me.k128.mcGeoParser.utilities;
+package me.k128.mcGeoParser;
 
-public class Vector3f {
+public class Vec3f {
 
     private final float[] floats;
     
-    public Vector3f(float x, float y, float z) {
+    public Vec3f(float x, float y, float z) {
         this.floats = new float[] {x, y, z};
     }
 

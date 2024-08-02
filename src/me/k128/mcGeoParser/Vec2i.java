@@ -1,10 +1,10 @@
-package me.k128.mcGeoParser.utilities;
+package me.k128.mcGeoParser;
 
-public class Vector2i {
+public class Vec2i {
 
     private final int[] ints;
     
-    public Vector2i(int x, int y) {
+    public Vec2i(int x, int y) {
         this.ints = new int[] {x, y};
     }
 

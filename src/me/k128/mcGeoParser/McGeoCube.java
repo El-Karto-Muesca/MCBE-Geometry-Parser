@@ -1,48 +1,57 @@
 package me.k128.mcGeoParser;
 
-import me.k128.mcGeoParser.utilities.Vector2i;
-import me.k128.mcGeoParser.utilities.Vector3f;
-
 public class McGeoCube {
-    private final Vector3f origin;
-    private final Vector3f size;
+    private final Vec3f origin;
+    private final Vec3f size;
     private final float inflate;
-    private final Vector3f pivot;
-    private final Vector3f rotation;
-    private final Vector2i uv;
+    private final Vec3f pivot;
+    private final Vec3f rotation;
+    private final UVType uvType;
+    private final Vec2i boxUV;
+    private final PerfaceUV perfaceUV;
 
-    public McGeoCube(
-        Vector3f origin, 
-        Vector3f size, 
+    McGeoCube(
+        Vec3f origin, 
+        Vec3f size, 
         float inflate, 
-        Vector3f pivot,
-        Vector3f rotation, 
-        Vector2i uv
+        Vec3f pivot, 
+        Vec3f rotation, 
+        UVType uvType, 
+        Vec2i boxUV,
+        PerfaceUV perfaceUV
     ) {
         this.origin = origin;
         this.size = size;
         this.inflate = inflate;
         this.pivot = pivot;
         this.rotation = rotation;
-        this.uv = uv;
+        this.uvType = uvType;
+        this.boxUV = boxUV;
+        this.perfaceUV = perfaceUV;
     }
 
-    public Vector3f getOrigin() {
+    public Vec3f getOrigin() {
         return origin;
     }
-    public Vector3f getSize() {
+    public Vec3f getSize() {
         return size;
     }
     public float getInflate() {
         return inflate;
     }
-    public Vector3f getPivot() {
+    public Vec3f getPivot() {
         return pivot;
     }
-    public Vector3f getRotation() {
+    public Vec3f getRotation() {
         return rotation;
     }
-    public Vector2i getUv() {
-        return uv;
+    public UVType getUVType() {
+        return uvType;
+    }
+    public Vec2i getBoxUV() {
+        return boxUV;
+    }
+    public PerfaceUV getPerfaceUV() {
+        return perfaceUV;
     }
 }

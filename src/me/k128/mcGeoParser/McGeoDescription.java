@@ -1,22 +1,20 @@
 package me.k128.mcGeoParser;
 
-import me.k128.mcGeoParser.utilities.Vector3f;
-
 public class McGeoDescription {
     private final String identifier;
     private final int textureWidth;
     private final int textureHeight;
     private final float visibleBoundsWidth;
     private final float visibleBoundsHeight;
-    private final Vector3f visibleBoundsOffset;
+    private final Vec3f visibleBoundsOffset;
     
-    public McGeoDescription(
+    McGeoDescription(
         String identifier, 
         int textureWidth, 
         int textureHeight, 
         float visibleBoundsWidth,
         float visibleBoundsHeight, 
-        Vector3f visibleBoundsOffset
+        Vec3f visibleBoundsOffset
     ) {
         this.identifier = identifier;
         this.textureWidth = textureWidth;
@@ -41,7 +39,7 @@ public class McGeoDescription {
     public float getVisibleBoundsHeight() {
         return visibleBoundsHeight;
     }
-    public Vector3f getVisibleBoundsOffset() {
+    public Vec3f getVisibleBoundsOffset() {
         return visibleBoundsOffset;
     }
 }

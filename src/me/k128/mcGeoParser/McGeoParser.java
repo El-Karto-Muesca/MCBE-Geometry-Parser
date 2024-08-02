@@ -11,9 +11,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import me.k128.mcGeoParser.utilities.Vector2i;
-import me.k128.mcGeoParser.utilities.Vector3f;
-
 public class McGeoParser {
     
     public static McGeo parse(String filepath) throws ParseException, FileNotFoundException, IOException {
@@ -41,7 +38,7 @@ public class McGeoParser {
             getInt(jsonObject, "texture_height"), 
             getFloat(jsonObject, "visible_bounds_width"), 
             getFloat(jsonObject, "visible_bounds_height"), 
-            getVector3f(jsonObject, "visible_bounds_offset")
+            getVec3f(jsonObject, "visible_bounds_offset")
         );
     } 
 
@@ -53,7 +50,7 @@ public class McGeoParser {
             bones.add(new McGeoBone(
                 getString(jsonObject, "name"), 
                 getString(jsonObject, "parent"), 
-                getVector3f(jsonObject, "pivot"), 
+                getVec3f(jsonObject, "pivot"), 
                 getCubes(getJSONArray(jsonObject, "cubes")))
             );
         }
@@ -70,16 +67,38 @@ public class McGeoParser {
         List<McGeoCube> cubes = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = getJSONObject(jsonArray, i);
+            UVType uvType = getUVType(jsonObject);
             cubes.add(new McGeoCube(
-                getVector3f(jsonObject, "origin"), 
-                getVector3f(jsonObject, "size"), 
+                getVec3f(jsonObject, "origin"), 
+                getVec3f(jsonObject, "size"), 
                 getFloat(jsonObject, "inflate"), 
-                getVector3f(jsonObject, "povit"), 
-                getVector3f(jsonObject, "rotation"), 
-                getVector2i(jsonObject, "uv")
+                getVec3f(jsonObject, "povit"), 
+                getVec3f(jsonObject, "rotation"), 
+                uvType, 
+                (uvType == UVType.BOX) ? getVec2i(jsonObject, "uv") : null,
+                (uvType == UVType.PERFACE) ? getPerfaceUV(getJSONObject(jsonObject, "uv")) : null
             ));
         }
         return cubes.toArray(new McGeoCube[cubes.size()]);
+    }
+
+    private static PerfaceUV getPerfaceUV(JSONObject jsonObject) {
+        JSONObject[] faces = new JSONObject[] {
+            getJSONObject(jsonObject, "north"),
+            getJSONObject(jsonObject, "east"),
+            getJSONObject(jsonObject, "south"),
+            getJSONObject(jsonObject, "west"),
+            getJSONObject(jsonObject, "up"),
+            getJSONObject(jsonObject, "down")
+        };
+        return new PerfaceUV(
+            new Face(getVec2i(faces[0], "uv"), getVec2i(faces[0], "uv_size")),
+            new Face(getVec2i(faces[1], "uv"), getVec2i(faces[1], "uv_size")),
+            new Face(getVec2i(faces[2], "uv"), getVec2i(faces[2], "uv_size")),
+            new Face(getVec2i(faces[3], "uv"), getVec2i(faces[3], "uv_size")),
+            new Face(getVec2i(faces[4], "uv"), getVec2i(faces[4], "uv_size")),
+            new Face(getVec2i(faces[5], "uv"), getVec2i(faces[5], "uv_size"))
+        );
     }
 
     // [ -------- < Utility Methods > -------- ] //
@@ -116,25 +135,35 @@ public class McGeoParser {
         };
     }
 
-    private static Vector3f getVector3f(JSONObject jsonObject, String key) {
+    private static Vec3f getVec3f(JSONObject jsonObject, String key) {
         Object object = jsonObject.get(key);
-        return (object != null) ? new Vector3f(
+        return (object != null) ? new Vec3f(
             castToFloat(getJSONArray(jsonObject, key).get(0)),
             castToFloat(getJSONArray(jsonObject, key).get(1)),
             castToFloat(getJSONArray(jsonObject, key).get(2))
-        ) : new Vector3f(0, 0, 0);
+        ) : new Vec3f(0, 0, 0);
     }
-    private static Vector2i getVector2i(JSONObject jsonObject, String key) {
+    private static Vec2i getVec2i(JSONObject jsonObject, String key) {
         Object object = jsonObject.get(key);
-        return (object != null) ? new Vector2i(
-            (int) (long) getJSONArray(jsonObject, key).get(0),
-            (int) (long) getJSONArray(jsonObject, key).get(1)
-        ) : new Vector2i(0, 0);
+        Object x = getJSONArray(jsonObject, key).get(0);
+        Object y = getJSONArray(jsonObject, key).get(1);
+        return (object != null) ? new Vec2i(
+            (x instanceof Long) ? (int) (long) x : Math.round(castToFloat(x)),
+            (y instanceof Long) ? (int) (long) y : Math.round(castToFloat(y))
+        ) : new Vec2i(0, 0);
     }
 
     private static JSONArray getJSONArray(JSONObject jsonObject, String key) {
         Object object = jsonObject.get(key);
         return object != null ? (JSONArray) object : new JSONArray();
+    }
+
+    private static UVType getUVType(JSONObject jsonObject) {
+        return switch(jsonObject.get("uv")) {
+            case JSONObject o -> UVType.PERFACE;
+            case JSONArray o -> UVType.BOX;
+            default -> null;
+        };
     }
     //#endregion
 }

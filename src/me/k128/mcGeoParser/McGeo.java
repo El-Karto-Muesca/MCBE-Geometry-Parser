@@ -5,7 +5,7 @@ public class McGeo {
     private final McGeoDescription description;
     private final McGeoBone[] bones;
 
-    public McGeo(String formatVersion, McGeoDescription description, McGeoBone[] bones) {
+    McGeo(String formatVersion, McGeoDescription description, McGeoBone[] bones) {
         this.formatVersion = formatVersion;
         this.description = description;
         this.bones = bones;
