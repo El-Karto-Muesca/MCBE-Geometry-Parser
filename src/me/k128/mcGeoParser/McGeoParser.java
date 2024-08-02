@@ -73,6 +73,7 @@ public class McGeoParser {
             cubes.add(new McGeoCube(
                 getVector3f(jsonObject, "origin"), 
                 getVector3f(jsonObject, "size"), 
+                getFloat(jsonObject, "inflate"), 
                 getVector3f(jsonObject, "povit"), 
                 getVector3f(jsonObject, "rotation"), 
                 getVector2i(jsonObject, "uv")
