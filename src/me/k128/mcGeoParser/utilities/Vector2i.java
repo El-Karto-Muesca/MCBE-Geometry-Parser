@@ -1,13 +1,13 @@
 package me.k128.mcGeoParser.utilities;
 
-public class Vector2i extends Vector<Integer> {
+public class Vector2i {
 
+    private final int[] ints;
+    
     public Vector2i(int x, int y) {
-        super(2);
-        super.set(0, x);
-        super.set(1, y);
+        this.ints = new int[] {x, y};
     }
 
-    public int getX() { return super.get(0); }
-    public int getY() { return super.get(1); }
+    public int getX() { return ints[0]; }
+    public int getY() { return ints[1]; }
 }
