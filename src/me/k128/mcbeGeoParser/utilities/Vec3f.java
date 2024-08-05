@@ -1,4 +1,4 @@
-package me.k128.mcpeGeoParser;
+package me.k128.mcbeGeoParser.utilities;
 
 public class Vec3f {
 
