@@ -8,6 +8,8 @@ public class Vec3f {
         this.floats = new float[] {x, y, z};
     }
 
+    public float[] get() { return floats; }
+
     public float getX() { return floats[0]; }
     public float getY() { return floats[1]; }
     public float getZ() { return floats[2]; }

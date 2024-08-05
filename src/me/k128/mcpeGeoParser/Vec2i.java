@@ -8,6 +8,8 @@ public class Vec2i {
         this.ints = new int[] {x, y};
     }
 
+    public int[] get() { return ints; }
+
     public int getX() { return ints[0]; }
     public int getY() { return ints[1]; }
 }
