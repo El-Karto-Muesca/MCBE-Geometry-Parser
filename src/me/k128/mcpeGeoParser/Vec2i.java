@@ -1,4 +1,4 @@
-package me.k128.mcGeoParser;
+package me.k128.mcpeGeoParser;
 
 public class Vec2i {
 

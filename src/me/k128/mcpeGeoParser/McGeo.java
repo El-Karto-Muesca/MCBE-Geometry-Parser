@@ -1,4 +1,4 @@
-package me.k128.mcGeoParser;
+package me.k128.mcpeGeoParser;
 
 public class McGeo {
     private final String formatVersion;

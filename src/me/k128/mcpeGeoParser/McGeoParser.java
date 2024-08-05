@@ -1,4 +1,4 @@
-package me.k128.mcGeoParser;
+package me.k128.mcpeGeoParser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
