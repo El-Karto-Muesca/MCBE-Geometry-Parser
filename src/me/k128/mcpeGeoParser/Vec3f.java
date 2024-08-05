@@ -4,6 +4,12 @@ public class Vec3f {
 
     private final float[] floats;
     
+    public Vec3f() {
+        this(0);
+    }
+    public Vec3f(float xyz) {
+        this(xyz, xyz, xyz);
+    }
     public Vec3f(float x, float y, float z) {
         this.floats = new float[] {x, y, z};
     }

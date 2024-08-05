@@ -6,17 +6,20 @@ public class McGeoBone {
     private McGeoBone parent = null;
     private final Vec3f pivot;
     private final McGeoCube[] cubes;
+    private final McGeoLocator[] locators;
 
     McGeoBone(
         String name,
         String parentName,
         Vec3f pivot,
-        McGeoCube[] cubes
+        McGeoCube[] cubes,
+        McGeoLocator[] locators
     ) {
         this.name = name;
         this.parentName = parentName;
         this.pivot = pivot;
         this.cubes = cubes;
+        this.locators = locators;
     }
 
     public String getName() {
@@ -36,5 +39,8 @@ public class McGeoBone {
     }
     public McGeoCube[] getCubes() {
         return cubes;
+    }
+    public McGeoLocator[] getLocators() {
+        return locators;
     }
 }
