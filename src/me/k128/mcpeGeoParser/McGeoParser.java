@@ -67,7 +67,7 @@ public class McGeoParser {
         List<McGeoCube> cubes = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = getJSONObject(jsonArray, i);
-            UVType uvType = getUVType(jsonObject);
+            McGeoUVType uvType = getUVType(jsonObject);
             cubes.add(new McGeoCube(
                 getVec3f(jsonObject, "origin"), 
                 getVec3f(jsonObject, "size"), 
@@ -75,14 +75,14 @@ public class McGeoParser {
                 getVec3f(jsonObject, "povit"), 
                 getVec3f(jsonObject, "rotation"), 
                 uvType, 
-                (uvType == UVType.BOX) ? getVec2i(jsonObject, "uv") : null,
-                (uvType == UVType.PERFACE) ? getPerfaceUV(getJSONObject(jsonObject, "uv")) : null
+                (uvType == McGeoUVType.BOX) ? getVec2i(jsonObject, "uv") : null,
+                (uvType == McGeoUVType.PERFACE) ? getPerfaceUV(getJSONObject(jsonObject, "uv")) : null
             ));
         }
         return cubes.toArray(new McGeoCube[cubes.size()]);
     }
 
-    private static PerfaceUV getPerfaceUV(JSONObject jsonObject) {
+    private static McGeoPerfaceUV getPerfaceUV(JSONObject jsonObject) {
         JSONObject[] faces = new JSONObject[] {
             getJSONObject(jsonObject, "north"),
             getJSONObject(jsonObject, "east"),
@@ -91,13 +91,13 @@ public class McGeoParser {
             getJSONObject(jsonObject, "up"),
             getJSONObject(jsonObject, "down")
         };
-        return new PerfaceUV(
-            new Face(getVec2i(faces[0], "uv"), getVec2i(faces[0], "uv_size")),
-            new Face(getVec2i(faces[1], "uv"), getVec2i(faces[1], "uv_size")),
-            new Face(getVec2i(faces[2], "uv"), getVec2i(faces[2], "uv_size")),
-            new Face(getVec2i(faces[3], "uv"), getVec2i(faces[3], "uv_size")),
-            new Face(getVec2i(faces[4], "uv"), getVec2i(faces[4], "uv_size")),
-            new Face(getVec2i(faces[5], "uv"), getVec2i(faces[5], "uv_size"))
+        return new McGeoPerfaceUV(
+            new McGeoFace(getVec2i(faces[0], "uv"), getVec2i(faces[0], "uv_size")),
+            new McGeoFace(getVec2i(faces[1], "uv"), getVec2i(faces[1], "uv_size")),
+            new McGeoFace(getVec2i(faces[2], "uv"), getVec2i(faces[2], "uv_size")),
+            new McGeoFace(getVec2i(faces[3], "uv"), getVec2i(faces[3], "uv_size")),
+            new McGeoFace(getVec2i(faces[4], "uv"), getVec2i(faces[4], "uv_size")),
+            new McGeoFace(getVec2i(faces[5], "uv"), getVec2i(faces[5], "uv_size"))
         );
     }
 
@@ -158,10 +158,10 @@ public class McGeoParser {
         return object != null ? (JSONArray) object : new JSONArray();
     }
 
-    private static UVType getUVType(JSONObject jsonObject) {
+    private static McGeoUVType getUVType(JSONObject jsonObject) {
         return switch(jsonObject.get("uv")) {
-            case JSONObject o -> UVType.PERFACE;
-            case JSONArray o -> UVType.BOX;
+            case JSONObject o -> McGeoUVType.PERFACE;
+            case JSONArray o -> McGeoUVType.BOX;
             default -> null;
         };
     }

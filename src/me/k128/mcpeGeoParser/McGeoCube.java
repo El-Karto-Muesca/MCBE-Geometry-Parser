@@ -6,9 +6,9 @@ public class McGeoCube {
     private final float inflate;
     private final Vec3f pivot;
     private final Vec3f rotation;
-    private final UVType uvType;
+    private final McGeoUVType uvType;
     private final Vec2i boxUV;
-    private final PerfaceUV perfaceUV;
+    private final McGeoPerfaceUV perfaceUV;
 
     McGeoCube(
         Vec3f origin, 
@@ -16,9 +16,9 @@ public class McGeoCube {
         float inflate, 
         Vec3f pivot, 
         Vec3f rotation, 
-        UVType uvType, 
+        McGeoUVType uvType, 
         Vec2i boxUV,
-        PerfaceUV perfaceUV
+        McGeoPerfaceUV perfaceUV
     ) {
         this.origin = origin;
         this.size = size;
@@ -45,13 +45,13 @@ public class McGeoCube {
     public Vec3f getRotation() {
         return rotation;
     }
-    public UVType getUVType() {
+    public McGeoUVType getUVType() {
         return uvType;
     }
     public Vec2i getBoxUV() {
         return boxUV;
     }
-    public PerfaceUV getPerfaceUV() {
+    public McGeoPerfaceUV getPerfaceUV() {
         return perfaceUV;
     }
 }
