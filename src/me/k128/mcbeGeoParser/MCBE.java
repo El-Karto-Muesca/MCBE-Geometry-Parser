@@ -20,30 +20,35 @@ import me.k128.mcbeGeoParser.exception.UnsupportedFormatException;
 
 public class MCBE {
     public final static class Geo {
-        private static final String[] SUPPORTED_FORMATS = {
-            "1.16.0",
-            "1.12.0"
-        }; 
+        private static final String FORMAT_VERSION_KEY = "format_version";
+        private static class SupportedFormat {
+            private static final String FORMAT = "1.12.0";   
+            private static final int MAJOR = Integer.parseInt(FORMAT.split(".")[0]);   
+            private static final int MINOR = Integer.parseInt(FORMAT.split(".")[1]);   
+        }
         
         public static Model parse(String filepath) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometry {
             return parse(new File(filepath));
         }
         
         public static Model parse(File file) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometry {
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(file));
-            return parse(jsonObject);
+            // JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(file));
+            return parse((JSONObject) new JSONParser().parse(new FileReader(file)));
         }
 
         private static Model parse(JSONObject jsonObject) throws UnsupportedFormatException, InvalidGeometry {
-            String format = "";
-            // format checking
-            try { formatCheck(format = (String) jsonObject.get("format_version")); } 
-            catch (NullPointerException exception) { throw new InvalidGeometry("format_version"); }
-            return new Model(format, getGeometry(jsonObject));
+            try { 
+                String format = (String) jsonObject.get(FORMAT_VERSION_KEY);
+                formatCheck(format); 
+                return new Model(format, getGeometry(jsonObject));
+            } catch (NullPointerException exception) { 
+                throw new InvalidGeometry(FORMAT_VERSION_KEY); 
+            }
         }
 
         private static void formatCheck(String format) throws UnsupportedFormatException {
-            for (String supportedFormat : SUPPORTED_FORMATS) if (format.equals(supportedFormat)) return;
+            String[] tokens = format.split(".");
+            if (Integer.parseInt(tokens[0]) == SupportedFormat.MAJOR && Integer.parseInt(tokens[1]) >= SupportedFormat.MINOR) return;
             throw new UnsupportedFormatException(format);
         }
 
@@ -222,6 +227,8 @@ public class MCBE {
 
         //#endregion
 
+        // [ -------- < Models > -------- ] //
+        
         //#region Models
 
         public static class Model {
@@ -273,7 +280,6 @@ public class MCBE {
                 return cubeCount;
             }
         }
-        
 
         public static class Bone {
             private final String name;
