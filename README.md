@@ -1,11 +1,11 @@
 > This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.
----
+
 ![Forge Logo](docs/assets/logo.png)
 
 # Minecraft Bedrock Geometry Java Parser
 It's exactly what it sounds like, just a simple lightweight **library** (not a GUI app) that turns a **[Minecraft]** Bedrock `.geo.json` model into a **[Java]** `object`.
 
-![GitHub License](https://img.shields.io/github/license/El-Karto-Muesca/McBedrock-Geo-Parser)
+![GitHub License](https://img.shields.io/github/license/El-Karto-Muesca/MCBE-Geometry-Parser)
 ![Static Badge](https://img.shields.io/badge/v0.1.0_alpha-Download_JAR-blue?style=flat)
 ![Static Badge](https://img.shields.io/badge/Supported_%22format__version%22-1.12.0_or_higher-red)
 
