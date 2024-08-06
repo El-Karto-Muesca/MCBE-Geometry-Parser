@@ -1,7 +1,5 @@
 ![Forge Logo](docs/assets/logo.png)
 
-<sub>This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.</sub>
-
 # Minecraft Bedrock Geometry Java Parser
 It's exactly what it sounds like, just a simple lightweight **library** (not a GUI app) that turns a **[Minecraft]** Bedrock `.geo.json` model into a **[Java]** `object` and make the 3D model data way easier to access without the need to parse it yourself.
 
@@ -99,17 +97,16 @@ I am aware though that some vanilla models in the ResourcePack still use format 
 But for now, a solution to that would be to use **[BlockBench]** to export them as bedrock models and I believe the format version would be converted to `1.12.0` or **higher**!
 
 ## 2. 2. Data Types:
-* All data is either stored in the form of `boolean`, `int`, `float` or a `String`, no `double` and `long`. 
+* All data is either stored as a `boolean`, `int`, `float` or a `String`, no `double` and `long`. 
 * There are some Vector classes such as `Vec3f` and `Vec2i` but they are just there to make data access easier.
 
 # 3. Motivation:
-Please note that the reason for the existence of this lib is that I needed a tool that can do the same, and I couldn't find any, so I wrote it, and spent a little extra to make is public and available for anyone to use, even tho I doubt that there is some one who would need this, but hey, if it helpt at lease one person somewhere in the world, that's a win for me :)!.
+Please note that the reason for the existence of this lib is that I needed a tool that can do the same, and I couldn't find any, so I wrote it, and spent a little extra to make it public and available for anyone to use, even tho I doubt that there is someone who would need this, but hey if it helps at least one person somewhere in the world, that's a win for me :)!.
 
 # 4. Contributing:
 Feel free to contribute to the project, even tho to be honest, other than the support for earlier formats, nothing really comes to mind to be added to the project, but who knows I might be wrong ¯\\(ツ)/¯. 
 
 
----
 <sub>This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.</sub>
 
 [//]: # (Reusable Links Section)
