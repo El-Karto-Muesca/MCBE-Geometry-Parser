@@ -1,11 +1,9 @@
-<sub>This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.</sub>
-
----
-
 ![Forge Logo](docs/assets/logo.png)
 
+<sub>This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.</sub>
+
 # Minecraft Bedrock Geometry Java Parser
-It's exactly what it sounds like, just a simple lightweight **library** (not a GUI app) that turns a **[Minecraft]** Bedrock `.geo.json` model into a **[Java]** `object`.
+It's exactly what it sounds like, just a simple lightweight **library** (not a GUI app) that turns a **[Minecraft]** Bedrock `.geo.json` model into a **[Java]** `object` and make the 3D model data way easier to access without the need to parse it yourself.
 
 [![GitHub License](https://img.shields.io/github/license/El-Karto-Muesca/MCBE-Geometry-Parser)](https://github.com/El-Karto-Muesca/MCBE-Geometry-Parser?tab=MIT-1-ov-file)
 [![GitHub Release](https://img.shields.io/github/v/release/El-Karto-Muesca/MCBE-Geometry-Parser)][Download]
@@ -104,8 +102,11 @@ But for now, a solution to that would be to use **[BlockBench]** to export them 
 * All data is either stored in the form of `boolean`, `int`, `float` or a `String`, no `double` and `long`. 
 * There are some Vector classes such as `Vec3f` and `Vec2i` but they are just there to make data access easier.
 
-# 3. Contributing:
-Feel free to contribute to the project, even tho to be honest, other than the support for earlier formats, nothing really comes to mind to be added to the project, but who knows I might be wrong ¯\\_(ツ)_/¯. 
+# 3. Motivation:
+Please note that the reason for the existence of this lib is that I needed a tool that can do the same, and I couldn't find any, so I wrote it, and spent a little extra to make is public and available for anyone to use, even tho I doubt that there is some one who would need this, but hey, if it helpt at lease one person somewhere in the world, that's a win for me :)!.
+
+# 4. Contributing:
+Feel free to contribute to the project, even tho to be honest, other than the support for earlier formats, nothing really comes to mind to be added to the project, but who knows I might be wrong ¯\\(ツ)/¯. 
 
 
 ---
