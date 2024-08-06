@@ -18,7 +18,7 @@ import me.k128.mcbeGeoParser.utilities.Vec2i;
 import me.k128.mcbeGeoParser.exception.InvalidGeometryException;
 import me.k128.mcbeGeoParser.exception.UnsupportedFormatException;
 
-class Parser {
+class Parser { 
     private static final String FORMAT_VERSION_KEY = "format_version";
     private static class SupportedFormat {
         private static final String FORMAT = "1.12.0";   
@@ -26,11 +26,11 @@ class Parser {
         private static final int MINOR = Integer.parseInt(FORMAT.split(".")[1]);   
     }
     
-    public static BedrockGeometry parse(String filepath) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
+    static BedrockGeometry parse(String filepath) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
         return parse(new File(filepath));
     }
     
-    public static BedrockGeometry parse(File file) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
+    static BedrockGeometry parse(File file) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
         return parse((JSONObject) new JSONParser().parse(new FileReader(file)));
     }
 
