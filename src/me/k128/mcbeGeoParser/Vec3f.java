@@ -1,16 +1,16 @@
-package me.k128.mcbeGeoParser.utilities;
+package me.k128.mcbeGeoParser;
 
 public class Vec3f {
 
     private final float[] floats;
     
-    public Vec3f() {
+    Vec3f() {
         this(0);
     }
-    public Vec3f(float xyz) {
+    Vec3f(float xyz) {
         this(xyz, xyz, xyz);
     }
-    public Vec3f(float x, float y, float z) {
+    Vec3f(float x, float y, float z) {
         this.floats = new float[] {x, y, z};
     }
 

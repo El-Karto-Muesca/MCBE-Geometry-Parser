@@ -1,0 +1,35 @@
+package me.k128.mcbeGeoParser;
+
+class Key {
+    static final String 
+    FORMAT_VERSION = "format_version",
+    MINECRAFT_GEOMETRY = "minecraft:geometry",
+    DESCRIPTION = "description",
+    IDENTIFIER = "identifier",
+    TEXTURE_WIDTH = "texture_width",
+    TEXTURE_HEIGHT = "texture_height",
+    TEXTURE_WIDTH_LEGACY = "texturewidth",
+    TEXTURE_HEIGHT_LEGACY = "textureheight",
+    VISIBLE_BOUNDS_WIDTH = "visible_bounds_width",
+    VISIBLE_BOUNDS_HEIGHT = "visible_bounds_height",
+    VISIBLE_BOUNDS_OFFSET = "visible_bounds_offset",
+    BONES = "bones",
+    NAME = "name",
+    PARENT = "parent",
+    PIVOT = "pivot",
+    CUBES = "cubes",
+    ORIGIN = "origin",
+    SIZE = "size",
+    INFLATE = "inflate",
+    ROTATION = "rotation",
+    UV = "uv",
+    UV_SIZE = "uv_size",
+    NORTH = "north",
+    EAST = "east",
+    SOUTH = "south",
+    WEST = "west",
+    UP = "up",
+    DOWN = "down",
+    LOCATORS = "locators",
+    $ = "$";
+}

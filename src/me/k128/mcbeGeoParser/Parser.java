@@ -1,6 +1,5 @@
 package me.k128.mcbeGeoParser;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,138 +12,178 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import me.k128.mcbeGeoParser.utilities.Vec3f;
-import me.k128.mcbeGeoParser.utilities.Vec2i;
-import me.k128.mcbeGeoParser.exception.InvalidGeometryException;
-import me.k128.mcbeGeoParser.exception.UnsupportedFormatException;
+import me.k128.mcbeGeoParser.BedrockGeometry.*;
 
 class Parser { 
-    private static final String FORMAT_VERSION_KEY = "format_version";
-    private static class SupportedFormat {
-        private static final String FORMAT = "1.12.0";   
-        private static final int MAJOR = Integer.parseInt(FORMAT.split(".")[0]);   
-        private static final int MINOR = Integer.parseInt(FORMAT.split(".")[1]);   
-    }
-    
-    static BedrockGeometry parse(String filepath) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
-        return parse(new File(filepath));
-    }
-    
-    static BedrockGeometry parse(File file) throws ParseException, FileNotFoundException, IOException, UnsupportedFormatException, InvalidGeometryException {
-        return parse((JSONObject) new JSONParser().parse(new FileReader(file)));
+
+    private record Format(String version, boolean legacy) {}
+    /**
+     * These are the tested and supported formats.
+     */
+    private static final Format[] SUPPORTED_FORMATS = {
+        new Format("1.16.0", false),
+        new Format("1.12.0", false),
+        new Format("1.10.0", true),
+        new Format("1.8.0", true)
+    };
+
+    public static BedrockGeometry parse(String filepath) throws UnsupportedFormatException, InvalidGeometryException, FileNotFoundException, IOException, ParseException {
+        // check for the .geo.json extention
+        if (!filepath.endsWith(".geo.json")) throw new InvalidGeometryException(Key.FORMAT_VERSION); 
+        
+        // parsing into a JSONObject
+        JSONObject jsonObject = (JSONObject) new JSONParser().parse(new FileReader(filepath));
+
+        // final we build the model
+        return build(jsonObject);
     }
 
-    private static BedrockGeometry parse(JSONObject jsonObject) throws UnsupportedFormatException, InvalidGeometryException {
+    private static BedrockGeometry build(JSONObject jsonObject) throws InvalidGeometryException, UnsupportedFormatException {
+        String format = "0.0.0";
+        
+        // try and fetch the format version
+        // if we catch a null exception then
+        // it's probably an invalide geometry
         try { 
-            String format = (String) jsonObject.get(FORMAT_VERSION_KEY);
-            formatCheck(format); 
-            return new BedrockGeometry(format, getGeometry(jsonObject));
+            format = (String) jsonObject.get(Key.FORMAT_VERSION);
         } catch (NullPointerException exception) { 
-            throw new InvalidGeometryException(FORMAT_VERSION_KEY); 
+            throw new InvalidGeometryException(Key.FORMAT_VERSION); 
         }
+
+        // now we got the format, we gonna do a quick validation.
+        // if it's valid, the method returns a boolean of whether
+        // it a legacy version or not.
+        boolean legacy = formatValidation(format);
+
+        // and then call the appropriate geometry method 
+        return new BedrockGeometry(format, legacy ? new Geometry[] { getGeometryLegacy(jsonObject) } : getGeometry(jsonObject));
     }
 
-    private static void formatCheck(String format) throws UnsupportedFormatException {
-        String[] tokens = format.split(".");
-        if (Integer.parseInt(tokens[0]) == SupportedFormat.MAJOR && Integer.parseInt(tokens[1]) >= SupportedFormat.MINOR) return;
+    /**
+     * @param format fetched
+     * @return {@code true} if the valid format is legacy, {@code false} otherwise.
+     * @throws UnsupportedFormatException if the given format is not supported.
+     */
+    private static boolean formatValidation(String format) throws UnsupportedFormatException {
+        for (Format SUPPORTED_FORMAT : SUPPORTED_FORMATS) 
+        if (format.equals(SUPPORTED_FORMAT.version)) return SUPPORTED_FORMAT.legacy;
         throw new UnsupportedFormatException(format);
     }
 
-    private static BedrockGeometry.Geometry[] getGeometry(JSONObject jsonObject) {
-        List<BedrockGeometry.Geometry> geometry = new ArrayList<>();
-        JSONArray jsonArray = getJSONArray(jsonObject, "minecraft:geometry");
+    private static Geometry[] getGeometry(JSONObject jsonObject) {
+        // Fetch the geometry array
+        JSONArray jsonArray = getJSONArray(jsonObject, Key.MINECRAFT_GEOMETRY);
+
+        // create a new array
+        Geometry[] geometry = new Geometry[jsonArray.size()];
+
+        // fill the array
         for (int i = 0; i < jsonArray.size(); i++) {
-            JSONObject geo = (JSONObject) jsonArray.get(i);
-            geometry.add(new BedrockGeometry.Geometry(
-                getDescription(getJSONObject(geo, "description")), 
-                getBones(getJSONArray(geo, "bones"))
-            ));
-        }
-        return geometry.toArray(new BedrockGeometry.Geometry[geometry.size()]);
+            JSONObject geoJsonObject = getJSONObject(jsonArray, i);
+            geometry[i] = new Geometry(
+                new Description(
+                    getString(geoJsonObject, Key.IDENTIFIER), 
+                    getInt(geoJsonObject, Key.TEXTURE_WIDTH, 1), 
+                    getInt(geoJsonObject, Key.TEXTURE_HEIGHT, 1), 
+                    getFloat(geoJsonObject, Key.VISIBLE_BOUNDS_WIDTH, 0), 
+                    getFloat(geoJsonObject, Key.VISIBLE_BOUNDS_HEIGHT, 0), 
+                    getVec3f(geoJsonObject, Key.VISIBLE_BOUNDS_OFFSET, new Vec3f())
+                ), 
+                getBones(getJSONArray(geoJsonObject, Key.BONES))
+            );
+        };
+
+        return geometry;
     }
 
-    private static BedrockGeometry.Description getDescription(JSONObject jsonObject) {
-        return new BedrockGeometry.Description(
-            getString(jsonObject, "identifier"), 
-            getInt(jsonObject, "texture_width"), 
-            getInt(jsonObject, "texture_height"), 
-            getFloat(jsonObject, "visible_bounds_width", 1), 
-            getFloat(jsonObject, "visible_bounds_height", 1), 
-            getVec3f(jsonObject, "visible_bounds_offset", new Vec3f())
+    private static Geometry getGeometryLegacy(JSONObject jsonObject) {
+        @SuppressWarnings("unchecked")
+        String identifier = (String) jsonObject.keySet().toArray(new Object[jsonObject.keySet().size()])[1];
+        JSONObject geoJsonObject = (JSONObject) jsonObject.get(identifier);
+        return new Geometry(
+            new Description(
+                identifier, 
+                getInt(geoJsonObject, Key.TEXTURE_WIDTH_LEGACY, 1), 
+                getInt(geoJsonObject, Key.TEXTURE_HEIGHT_LEGACY, 1), 
+                getFloat(geoJsonObject, Key.VISIBLE_BOUNDS_WIDTH, 0), 
+                getFloat(geoJsonObject, Key.VISIBLE_BOUNDS_HEIGHT, 0), 
+                getVec3f(geoJsonObject, Key.VISIBLE_BOUNDS_OFFSET, new Vec3f())
+            ), 
+            getBones(getJSONArray(geoJsonObject, Key.BONES))
         );
     }
 
-    private static BedrockGeometry.Bone[] getBones(JSONArray jsonArray) {
-        List<BedrockGeometry.Bone> bones = new ArrayList<>();
+    private static Bone[] getBones(JSONArray jsonArray) {
+        List<Bone> bones = new ArrayList<>();
         // parsing the bones
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = getJSONObject(jsonArray, i);
-            bones.add(new BedrockGeometry.Bone(
-                getString(jsonObject, "name"), 
-                getString(jsonObject, "parent"),
-                getVec3f(jsonObject, "pivot", new Vec3f()), 
-                getCubes(getJSONArray(jsonObject, "cubes")),
+            bones.add(new Bone(
+                getString(jsonObject, Key.NAME), 
+                getString(jsonObject, Key.PARENT),
+                getVec3f(jsonObject, Key.PIVOT, new Vec3f()), 
+                getCubes(getJSONArray(jsonObject, Key.CUBES)),
                 getLocators(jsonObject)
             ));
         }
         // Setting each bone parent
-        for (BedrockGeometry.Bone bone : bones) {
-            for (BedrockGeometry.Bone bone2 : bones) {
+        for (Bone bone : bones) {
+            for (Bone bone2 : bones) {
                 if (bone2.getName().equals(bone.getParentName())) { bone.setParent(bone2); }
             }
         }
-        return bones.toArray(new BedrockGeometry.Bone[bones.size()]);
+        return bones.toArray(new Bone[bones.size()]);
     }
     
-    private static BedrockGeometry.Cube[] getCubes(JSONArray jsonArray) {
-        List<BedrockGeometry.Cube> cubes = new ArrayList<>();
+    private static Cube[] getCubes(JSONArray jsonArray) {
+        List<Cube> cubes = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = getJSONObject(jsonArray, i);
-            BedrockGeometry.UVType uvType = getUVType(jsonObject);
-            cubes.add(new BedrockGeometry.Cube(
-                getVec3f(jsonObject, "origin", new Vec3f()), 
-                getVec3f(jsonObject, "size", new Vec3f(1)), 
-                getFloat(jsonObject, "inflate", 1), 
-                getVec3f(jsonObject, "povit", new Vec3f()), 
-                getVec3f(jsonObject, "rotation", new Vec3f()), 
+            UVType uvType = getUVType(jsonObject);
+            cubes.add(new Cube(
+                getVec3f(jsonObject, Key.ORIGIN, new Vec3f()), 
+                getVec3f(jsonObject, Key.SIZE, new Vec3f(1)), 
+                getFloat(jsonObject, Key.INFLATE, 1), 
+                getVec3f(jsonObject, Key.PIVOT, new Vec3f()), 
+                getVec3f(jsonObject, Key.ROTATION, new Vec3f()), 
                 uvType, 
-                (uvType == BedrockGeometry.UVType.BOX) ? getVec2i(jsonObject, "uv") : null,
-                (uvType == BedrockGeometry.UVType.PERFACE) ? getPerfaceUV(getJSONObject(jsonObject, "uv")) : null
+                (uvType == UVType.BOX) ? getVec2i(jsonObject, Key.UV, new Vec2i()) : null,
+                (uvType == UVType.PERFACE) ? getPerfaceUV(getJSONObject(jsonObject, Key.UV)) : null
             ));
         }
-        return cubes.toArray(new BedrockGeometry.Cube[cubes.size()]);
+        return cubes.toArray(new Cube[cubes.size()]);
     }
 
-    private static BedrockGeometry.Locator[] getLocators(JSONObject location) {
-        List<BedrockGeometry.Locator> locators = new ArrayList<>();
+    private static Locator[] getLocators(JSONObject location) {
+        List<Locator> locators = new ArrayList<>();
 
-        Object object = location.get("locators");
+        Object object = location.get(Key.LOCATORS);
         if (object != null) {
-            JSONObject jsonObject = getJSONObject(location, "locators");
+            JSONObject jsonObject = getJSONObject(location, Key.LOCATORS);
             @SuppressWarnings("unchecked")
             Set<String> keys = jsonObject.keySet();
-            for (String key : keys) locators.add(new BedrockGeometry.Locator(key, getVec3f(jsonObject, key, new Vec3f())));
+            for (String key : keys) locators.add(new Locator(key, getVec3f(jsonObject, key, new Vec3f())));
         }
 
-        return locators.toArray(new BedrockGeometry.Locator[locators.size()]);
+        return locators.toArray(new Locator[locators.size()]);
     }
 
-    private static BedrockGeometry.PerfaceUV getPerfaceUV(JSONObject jsonObject) {
+    private static PerfaceUV getPerfaceUV(JSONObject jsonObject) {
         JSONObject[] faces = new JSONObject[] {
-            getJSONObject(jsonObject, "north"),
-            getJSONObject(jsonObject, "east"),
-            getJSONObject(jsonObject, "south"),
-            getJSONObject(jsonObject, "west"),
-            getJSONObject(jsonObject, "up"),
-            getJSONObject(jsonObject, "down")
+            getJSONObject(jsonObject, Key.NORTH),
+            getJSONObject(jsonObject, Key.EAST),
+            getJSONObject(jsonObject, Key.SOUTH),
+            getJSONObject(jsonObject, Key.WEST),
+            getJSONObject(jsonObject, Key.UP),
+            getJSONObject(jsonObject, Key.DOWN)
         };
-        return new BedrockGeometry.PerfaceUV(
-            faces[0] != null ? new BedrockGeometry.Face(getVec2i(faces[0], "uv"), getVec2i(faces[0], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i()),
-            faces[1] != null ? new BedrockGeometry.Face(getVec2i(faces[1], "uv"), getVec2i(faces[1], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i()),
-            faces[2] != null ? new BedrockGeometry.Face(getVec2i(faces[2], "uv"), getVec2i(faces[2], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i()),
-            faces[3] != null ? new BedrockGeometry.Face(getVec2i(faces[3], "uv"), getVec2i(faces[3], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i()),
-            faces[4] != null ? new BedrockGeometry.Face(getVec2i(faces[4], "uv"), getVec2i(faces[4], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i()),
-            faces[5] != null ? new BedrockGeometry.Face(getVec2i(faces[5], "uv"), getVec2i(faces[5], "uv_size")) : new BedrockGeometry.Face(new Vec2i(), new Vec2i())
+        return new PerfaceUV(
+            faces[0] != null ? new Face(getVec2i(faces[0], Key.UV, new Vec2i()), getVec2i(faces[0], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i()),
+            faces[1] != null ? new Face(getVec2i(faces[1], Key.UV, new Vec2i()), getVec2i(faces[1], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i()),
+            faces[2] != null ? new Face(getVec2i(faces[2], Key.UV, new Vec2i()), getVec2i(faces[2], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i()),
+            faces[3] != null ? new Face(getVec2i(faces[3], Key.UV, new Vec2i()), getVec2i(faces[3], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i()),
+            faces[4] != null ? new Face(getVec2i(faces[4], Key.UV, new Vec2i()), getVec2i(faces[4], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i()),
+            faces[5] != null ? new Face(getVec2i(faces[5], Key.UV, new Vec2i()), getVec2i(faces[5], Key.UV_SIZE, new Vec2i())) : new Face(new Vec2i(), new Vec2i())
         );
     }
 
@@ -173,24 +212,24 @@ class Parser {
         return (object != null) ? castToFloat(object) : def;
     }
 
-    private static int getInt(JSONObject jsonObject, String key) {
+    private static int getInt(JSONObject jsonObject, String key, int def) {
         Object object = jsonObject.get(key);
-        return (object != null) ? castToInt(object) : 0;
+        return (object != null) ? castToInt(object) : def;
     }
-    private static int getInt(JSONArray jsonArray, int index) {
+    private static int getInt(JSONArray jsonArray, int index, int def) {
         Object object = jsonArray.get(index);
-        return (object != null) ? castToInt(object) : 0;
+        return (object != null) ? castToInt(object) : def;
     }
 
+    private static int castToInt(Object object) {
+        return (object instanceof Long) ? (int) (long) object : Math.round(castToFloat(object));
+    }
     private static float castToFloat(Object object) {
         return switch(object) {
             case Long o -> (float) o;
             case Double o -> (float) (double) o;
             default -> 0f;
         };
-    }
-    private static int castToInt(Object object) {
-        return (object instanceof Long) ? (int) (long) object : Math.round(castToFloat(object));
     }
 
     private static Vec3f getVec3f(JSONObject jsonObject, String key, Vec3f def) {
@@ -201,11 +240,11 @@ class Parser {
             getFloat(getJSONArray(jsonObject, key), 2, def.getZ())
         ) : def;
     }
-    private static Vec2i getVec2i(JSONObject jsonObject, String key) {
+    private static Vec2i getVec2i(JSONObject jsonObject, String key, Vec2i def) {
         Object object = jsonObject.get(key);
         return (object != null) ? new Vec2i(
-            getInt(getJSONArray(jsonObject, key), 0),
-            getInt(getJSONArray(jsonObject, key), 1)
+            getInt(getJSONArray(jsonObject, key), 0, def.getX()),
+            getInt(getJSONArray(jsonObject, key), 1, def.getY())
         ) : new Vec2i(0, 0);
     }
 
@@ -214,16 +253,14 @@ class Parser {
         return object != null ? (JSONArray) object : new JSONArray();
     }
 
-    private static BedrockGeometry.UVType getUVType(JSONObject jsonObject) {
-        if (jsonObject.get("uv") == null) return null;
-        return switch(jsonObject.get("uv")) {
-            case JSONObject o -> BedrockGeometry.UVType.PERFACE;
-            case JSONArray o -> BedrockGeometry.UVType.BOX;
+    private static UVType getUVType(JSONObject jsonObject) {
+        if (jsonObject.get(Key.UV) == null) return null;
+        return switch(jsonObject.get(Key.UV)) {
+            case JSONObject o -> UVType.PERFACE;
+            case JSONArray o -> UVType.BOX;
             default -> null;
         };
     }
-    // public enum BedrockGeometry.UVType {
-    //     BOX,
-    //     PERFACE 
-    // }
+
+    // #endregion
 }

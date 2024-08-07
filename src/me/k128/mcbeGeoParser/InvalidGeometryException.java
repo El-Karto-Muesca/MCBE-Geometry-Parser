@@ -1,8 +1,8 @@
-package me.k128.mcbeGeoParser.exception;
+package me.k128.mcbeGeoParser;
 
 public class InvalidGeometryException extends Exception {
 
-    public InvalidGeometryException(String key) {
+    InvalidGeometryException(String key) {
         super("Couldn't find " + key + " key.");
     }
 

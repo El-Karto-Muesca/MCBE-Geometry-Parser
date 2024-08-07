@@ -6,12 +6,6 @@ import java.io.IOException;
 
 import org.json.simple.parser.ParseException;
 
-import me.k128.mcbeGeoParser.exception.InvalidGeometryException;
-import me.k128.mcbeGeoParser.exception.UnsupportedFormatException;
-
-import me.k128.mcbeGeoParser.utilities.Vec2i;
-import me.k128.mcbeGeoParser.utilities.Vec3f;
-
 /**
  * @author <a href="https://github.com/El-Karto-Muesca"> k-128 <a/>
  */
@@ -46,25 +40,25 @@ public class BedrockGeometry {
         return Parser.parse(filepath);
     }
     
-    /**
-     * @param file the {@code .geo.json} file. (Format versions supported are {@code 1.12.0} or higher!)
-     * @return a {@link BedrockGeometry} object.
-     * @throws FileNotFoundException if your mo... I mean your file was not found... come on, you think I was going to say you MOM? pff... or was I? (piano in bg)
-     * @throws IOException if the I/O operations failed or got interrupted.
-     * @throws ParseException if the JOSN file is cursed and the JSONParser couldn't parse these nu... couldn't parse the file.
-     * @throws UnsupportedFormatException if the format version in earlier than {@code 1.12.0}.
-     * @throws InvalidGeometryException if the geometry is cursed, meaning a major property couldn't be found.
-     * @author <a href="https://github.com/El-Karto-Muesca"> k-128 <a/>
-     * @see #parse(String filepath)
-     */
-    public static BedrockGeometry parse(File file) throws 
-        ParseException, 
-        FileNotFoundException, 
-        IOException, 
-        UnsupportedFormatException, 
-        InvalidGeometryException {
-        return Parser.parse(file);
-    }
+    // /**
+    //  * @param file the {@code .geo.json} file. (Format versions supported are {@code 1.12.0} or higher!)
+    //  * @return a {@link BedrockGeometry} object.
+    //  * @throws FileNotFoundException if your mo... I mean your file was not found... come on, you think I was going to say you MOM? pff... or was I? (piano in bg)
+    //  * @throws IOException if the I/O operations failed or got interrupted.
+    //  * @throws ParseException if the JOSN file is cursed and the JSONParser couldn't parse these nu... couldn't parse the file.
+    //  * @throws UnsupportedFormatException if the format version in earlier than {@code 1.12.0}.
+    //  * @throws InvalidGeometryException if the geometry is cursed, meaning a major property couldn't be found.
+    //  * @author <a href="https://github.com/El-Karto-Muesca"> k-128 <a/>
+    //  * @see #parse(String filepath)
+    //  */
+    // public static BedrockGeometry parse(File file) throws 
+    //     ParseException, 
+    //     FileNotFoundException, 
+    //     IOException, 
+    //     UnsupportedFormatException, 
+    //     InvalidGeometryException {
+    //     return Parser.parse(file);
+    // }
 
     /**
      * @return the {@code "format_version"}.
@@ -145,86 +139,6 @@ public class BedrockGeometry {
          */
         public int getCubeCount() {
             return cubeCount;
-        }
-    }
-
-    public static class Bone {
-        private final String name;
-        private final String parentName;
-        private Bone parent = null;
-        private final Vec3f pivot;
-        private final Cube[] cubes;
-        private final Locator[] locators;
-    
-        Bone(
-            String name,
-            String parentName,
-            Vec3f pivot,
-            Cube[] cubes,
-            Locator[] locators
-        ) {
-            this.name = name;
-            this.parentName = parentName;
-            this.pivot = pivot;
-            this.cubes = cubes;
-            this.locators = locators;
-        }
-    
-        /**
-         * @return the bone's {@code name}.
-         * @see #getParent()
-         * @see #getPivot()
-         * @see #getCubes()
-         * @see #getLocators()
-         */
-        public String getName() {
-            return name;
-        }
-        /**
-         * @return the bone's {@code parent}.
-         * @see #getName()
-         * @see #getPivot()
-         * @see #getCubes()
-         * @see #getLocators()
-         */
-        public Bone getParent() {
-            return parent;
-        }
-        void setParent(Bone parent) {
-            this.parent = parent;
-        }
-        String getParentName() {
-            return parentName;
-        }
-        /**
-         * @return the bone's {@code pivot}.
-         * @see #getName()
-         * @see #getParent()
-         * @see #getCubes()
-         * @see #getLocators()
-         */
-        public Vec3f getPivot() {
-            return pivot;
-        }
-        /**
-         * @return the bone's array of {@code cubes}.
-         * @see #getName()
-         * @see #getParent()
-         * @see #getPivot()
-         * @see #getLocators()
-         */
-        public Cube[] getCubes() {
-            return cubes;
-        }
-        /**
-         * @return the bone's array of {@code locators}.
-         * @see #getName()
-         * @see #getParent()
-         * @see #getPivot()
-         * @see #getCubes()
-         */
-        public Locator[] getLocators() {
-            return locators;
         }
     }
 
@@ -320,23 +234,83 @@ public class BedrockGeometry {
         }
     }
 
-    public static class Locator {
+    public static class Bone {
         private final String name;
-        private final Vec3f coords;
+        private final String parentName;
+        private Bone parent = null;
+        private final Vec3f pivot;
+        private final Cube[] cubes;
+        private final Locator[] locators;
     
-        Locator(
-            String name, 
-            Vec3f coords
+        Bone(
+            String name,
+            String parentName,
+            Vec3f pivot,
+            Cube[] cubes,
+            Locator[] locators
         ) {
             this.name = name;
-            this.coords = coords;
+            this.parentName = parentName;
+            this.pivot = pivot;
+            this.cubes = cubes;
+            this.locators = locators;
         }
-        
+    
+        /**
+         * @return the bone's {@code name}.
+         * @see #getParent()
+         * @see #getPivot()
+         * @see #getCubes()
+         * @see #getLocators()
+         */
         public String getName() {
             return name;
         }
-        public Vec3f getCoords() {
-            return coords;
+        /**
+         * @return the bone's {@code parent}.
+         * @see #getName()
+         * @see #getPivot()
+         * @see #getCubes()
+         * @see #getLocators()
+         */
+        public Bone getParent() {
+            return parent;
+        }
+        void setParent(Bone parent) {
+            this.parent = parent;
+        }
+        String getParentName() {
+            return parentName;
+        }
+        /**
+         * @return the bone's {@code pivot}.
+         * @see #getName()
+         * @see #getParent()
+         * @see #getCubes()
+         * @see #getLocators()
+         */
+        public Vec3f getPivot() {
+            return pivot;
+        }
+        /**
+         * @return the bone's array of {@code cubes}.
+         * @see #getName()
+         * @see #getParent()
+         * @see #getPivot()
+         * @see #getLocators()
+         */
+        public Cube[] getCubes() {
+            return cubes;
+        }
+        /**
+         * @return the bone's array of {@code locators}.
+         * @see #getName()
+         * @see #getParent()
+         * @see #getPivot()
+         * @see #getCubes()
+         */
+        public Locator[] getLocators() {
+            return locators;
         }
     }
 
@@ -483,6 +457,26 @@ public class BedrockGeometry {
             return perfaceUV;
         }
 
+    }
+
+    public static class Locator {
+        private final String name;
+        private final Vec3f coords;
+    
+        Locator(
+            String name, 
+            Vec3f coords
+        ) {
+            this.name = name;
+            this.coords = coords;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        public Vec3f getCoords() {
+            return coords;
+        }
     }
 
     public static class Face {
