@@ -5,7 +5,6 @@ It's exactly what it sounds like, just a simple lightweight **library** (not a G
 
 [![GitHub License](https://img.shields.io/github/license/El-Karto-Muesca/MCBE-Geometry-Parser)](https://github.com/El-Karto-Muesca/MCBE-Geometry-Parser?tab=MIT-1-ov-file)
 [![GitHub Release](https://img.shields.io/github/v/release/El-Karto-Muesca/MCBE-Geometry-Parser)][Download]
-[![Static Badge](https://img.shields.io/badge/Supported_format-1.12.0+-red)](#)
 
 
 # 1. How to use:
@@ -47,7 +46,17 @@ int boneCount = geo.getGeometry()[0].getCubeCount();
 The method will of course throw some exceptions, and you gonna have to handle them all with a good old `try_catch` expression like so:
 
 ``` java
-String filepath = "../path/to/something.geo.json";
+String filepath = "../path/to/theseNuts.geo.json";
+
+try {
+    BedrockGeometry geo = BedrockGeometry.parse(filepath);
+} catch (Exception e) {
+    // handle exceptions here...
+}
+```
+*Handling all exceptions in one catch.*
+``` java
+String filepath = "../path/to/theseNuts.geo.json";
 
 try {
     BedrockGeometry geo = BedrockGeometry.parse(filepath);
@@ -68,11 +77,16 @@ try {
     // handle exception here...
 }
 ```
+*Handling each exception on its own.*
 
 # 2. Good to know info:
 ## 2. 1. Supported formats:
 
-Not all format versions are supported! Only `1.12.0` or **higher**.
+The supported format version are `1.16.0`, `1.12.0`, `1.10.0` and `1.8.0`, which to my knowledge are the only version out there? at least within the vanilla bedrock resourcepack, and **[BlockBench]** only exports bedrock geometry in `1.12.0` and `1.10.0` for legacy.
+
+So practicaly all versions are supported?
+
+Still the parcer will do a version check just in case and will throw an `UnsupportedFormatException` if it's none of the format versions above.
 
 ### Example:
 ``` JSON
@@ -84,17 +98,11 @@ Not all format versions are supported! Only `1.12.0` or **higher**.
 *This is gonna work just fine! :D*
 ``` JSON
 {
-    "format_version": "1.8.0",
+    "format_version": "ur.ma.ma",
     "geometry.bat": {}
 }
 ```
 *This is NOT gonna work! and will throw an `UnsupportedFormatException` :(*
-
-
-Why? Well I didn't think it would be needed since **[BlockBench]** exports Bedrock geo in `1.12.0` format,
-I am aware though that some vanilla models in the ResourcePack still use format versions as early as `1.8.0`, and we might be able to add support for such format in the future.
-
-But for now, a solution to that would be to use **[BlockBench]** to export them as bedrock models and I believe the format version would be converted to `1.12.0` or **higher**!
 
 ## 2. 2. Data Types:
 * All data is either stored as a `boolean`, `int`, `float` or a `String`, no `double` and `long`. 
@@ -102,10 +110,6 @@ But for now, a solution to that would be to use **[BlockBench]** to export them 
 
 # 3. Motivation:
 Please note that the reason for the existence of this lib is that I needed a tool that can do the same, and I couldn't find any, so I wrote it, and spent a little extra to make it public and available for anyone to use, even tho I doubt that there is someone who would need this, but hey if it helps at least one person somewhere in the world, that's a win for me :)!.
-
-# 4. Contributing:
-Feel free to contribute to the project, even tho to be honest, other than the support for earlier formats, nothing really comes to mind to be added to the project, but who knows I might be wrong ¯\\(ツ)/¯. 
-
 
 <sub>This Repository is **NOT** affiliated or endorsed by Mojang AB or Microsoft Inc. Mojang and Minecraft are trademarks of Mojang AB.</sub>
 
